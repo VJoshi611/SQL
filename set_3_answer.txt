@@ -1,0 +1,72 @@
+101] select distinct username, activity, startDate, endDate
+from
+    (select u.*,
+           rank() over (partition by username order by startDate desc) as rnk,
+           count(activity) over (partition by username) as num
+    from UserActivity u) t
+where (num <> 1 and rnk = 2) or (num = 1 and rnk = 1)
+
+103] SELECT NAME FROM STUDENTS WHERE MARKS > 75 ORDER BY RIGHT(NAME,3), ID ASC
+
+104] SELECT name FROM Employee ORDER BY name;
+
+105] SELECT CASE
+WHEN A + B <= C OR A + C <= B OR B + C <= A THEN 'Not A Triangle'
+WHEN A = B AND B = C THEN 'Equilateral'
+WHEN A = B OR B = C OR A = C THEN 'Isosceles'
+ELSE 'Scalene'
+END
+FROM TRIANGLES;
+
+106] select ceil(avg(salary) - avg(replace(salary, '0', ''))) from employees;
+
+107]  select MAX(salary*months), COUNT(*) from Employee where (salary * months) >= (select MAX(salary * months) from employee);
+
+108] SELECT Doctor, Professor, Singer, Actor FROM (
+SELECT ROW_NUMBER() OVER (PARTITION BY occupation ORDER BY name) as rn, name, occupation FROM       occupations) 
+PIVOT 
+(MAX(name) FOR occupation IN ('Doctor' as Doctor,'Professor' as Professor, 'Singer' as Singer, 'Actor' as Actor)) 
+ORDER BY rn;
+
+109] 
+
+110] SELECT N,
+CASE
+WHEN P IS NULL THEN 'Root'
+WHEN N IN (SELECT P FROM BST) THEN 'Inner'
+ELSE 'Leaf'
+END
+FROM BST
+ORDER by N;
+
+111] SELECT c.company_code, c.founder, COUNT(DISTINCT e.lead_manager_code), COUNT(DISTINCT e.senior_manager_code), COUNT(DISTINCT e.manager_code), COUNT(DISTINCT e.employee_code) FROM company c
+JOIN employee e ON c.company_code = e.company_code GROUP BY c.company_code, c.founder ORDER BY c.company_code;
+ 
+115] SELECT NAME FROM STUDENTS WHERE MARKS > 75 ORDER BY RIGHT(NAME,3), ID ASC
+
+116] SELECT name FROM Employee ORDER BY name;
+
+117] SELECT name FROM Employee WHERE salary > 2000 AND months < 10 ORDER BY employee_id;
+
+118] SELECT CASE
+WHEN A + B <= C OR A + C <= B OR B + C <= A THEN 'Not A Triangle'
+WHEN A = B AND B = C THEN 'Equilateral'
+WHEN A = B OR B = C OR A = C THEN 'Isosceles'
+ELSE 'Scalene'
+END
+FROM TRIANGLES;
+
+122] SET @rowindex := -1;
+ 
+SELECT
+   AVG(d.distance) as Median 
+FROM
+   (SELECT @rowindex:=@rowindex + 1 AS rowindex,
+           demo.distance AS distance
+    FROM demo
+    ORDER BY demo.distance) AS d
+WHERE
+d.rowindex IN (FLOOR(@rowindex / 2), CEIL(@rowindex / 2));
+
+
+123]      

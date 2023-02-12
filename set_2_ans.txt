@@ -1,0 +1,208 @@
+51] select name, population, area from World where area >= 3000000 or population > 25000000
+52] select name from Customer where referee_id != 2 
+53] select name as Customers from Customers where id not in (select customerId from Orders)
+54] select distint player_id, distint device_id from Activity dense_rank() over(partition by player_id order by evenr_date) from Activity;
+
+55] select c.name as country 
+from Person p 
+inner join Country c 
+on left (p.phone_number,3) = c.country_code 
+inner join (select caller_id as id, duration 
+            from Calls 
+            
+            union all 
+            
+            select callee_id as id, duration 
+            from Calls) phn 
+on p.id = phn.id 
+group by country 
+having avg(duration) > (select avg(duration) from Calls)
+
+56] select distint player_id, distint device_id from Activity dense_rank() over(partition by player_id order by evenr_date) from Activity;
+
+57] select max(count(customer_number)) from Orders group by customer_number
+
+58] SELECT
+	player_id,
+	device_id
+FROM (
+	 SELECT 
+	 	player_id,
+	 	device_id,
+	 	event_date,
+	 	MIN(event_date) OVER(PARTITION BY player_id ORDER BY event_date) as first_login
+	 FROM Activity
+ 	) t1
+ WHERE event_date = first_login 
+
+59] SELECT name
+FROM salesperson
+WHERE sales_id
+NOT IN (
+    SELECT s.sales_id FROM orders o
+    INNER JOIN salesperson s ON o.sales_id = s.sales_id
+    INNER JOIN company c ON o.com_id = c.com_id
+    WHERE c.name = 'RED'
+)
+
+60] select *  
+CASE WHEN x + y > z or x + z > y or y + z > x THEN "YES"
+ELSE "NO" 
+END AS triangle
+from Triangle
+
+61] SELECT MIN(abs(p2.x - p1.x)) shortest
+FROM point p1 JOIN point p2
+ON p1.x != p2.x
+
+
+62] select actor_id, director_id from ActorDirector group by actor_id, director_id having count(actor_id, director_id) = 3
+
+63] select p.product_name, s.year, s.price
+from Sales s
+left join Product p
+on s.product_id = p.product_id
+
+64] select project_id , round(avg(experience_years), 2) as average_years
+from project as p
+left join employee as e
+on p.employee_id = e.employee_id
+group by project_id
+
+65] select distinct seller_id
+from Sales
+group by seller_id
+having sum(price) = (
+    select sum(price) as max_price
+    from Sales
+    group by seller_id
+    order by max_price desc
+    limit 1)
+
+66] select distinct buyer_id from Sales s
+join Product p
+on p.product_id = s.product_id
+where p.product_name = 'S8'
+and buyer_id not in
+(
+select buyer_id from Sales s
+    join Product p on p.product_id = s.product_id
+    where p.product_name = 'iPhone'
+)
+
+67] select c1.visited_on, sum(c2.amount) as amount, 
+    round(avg(c2.amount), 2) as average_amount
+from (select visited_on, sum(amount) as amount 
+      from customer group by visited_on) c1
+join (select visited_on, sum(amount) as amount 
+      from customer group by visited_on) c2
+on datediff(c1.visited_on, c2.visited_on) between 0 and 6
+group by c1.visited_on
+having count(c2.amount) = 7
+
+68] SELECT
+    gender,
+    day,
+    SUM(score_points) OVER(PARTITION BY gender ORDER BY day) as total
+FROM Scores
+
+69] select min(log_id) as start_id, max(log_id) as end_id
+from (select l.log_id, (l.log_id - l.row_num) as diff
+      from (select log_id, row_number() over() as row_num from Logs) l
+      ) l2
+group by diff
+
+70] 
+
+71] select e3.employee_id from Employees e1, Employees e2, Employees e3
+where e1.manager_id = 1 and e2.manager_id = e1.employee_id and e3.manager_id = e2.employee_id and e3.employee_id != 1
+
+72] select date_format(trans_date,"%Y-%m") as month, country, 
+    count(id) as trans_count,
+    sum(case when state='approved' then 1  else 0 end) as approved_count,
+    sum(amount) as trans_total_amount,
+    sum(case when state='approved' then amount  else 0 end) as approved_total_amount
+from transactions
+group by month, country
+
+73] select ifnull(round(sum(remove_count / spam_count * 100) / count(distinct action_date), 2), 0)
+    as average_daily_percent
+    from (
+        select action_date, count(distinct a.post_id) as spam_count, count(distinct r.post_id) as remove_count
+            from Actions a left join Removals r on a.post_id = r.post_id
+            where a.extra = 'spam'
+            group by a.action_date
+    ) as a
+
+74] WITH CTE AS (
+SELECT
+player_id, min(event_date) as event_start_date
+from
+Activity
+group by player_id )
+
+SELECT
+round((count(distinct c.player_id) / (select count(distinct player_id) from activity)),2)as fraction
+FROM
+CTE c
+JOIN Activity a
+on c.player_id = a.player_id
+and datediff(c.event_start_date, a.event_date) = -1
+
+75] WITH CTE AS (
+SELECT
+player_id, min(event_date) as event_start_date
+from
+Activity
+group by player_id )
+
+SELECT
+round((count(distinct c.player_id) / (select count(distinct player_id) from activity)),2)as fraction
+FROM
+CTE c
+JOIN Activity a
+on c.player_id = a.player_id
+and datediff(c.event_start_date, a.event_date) = -1
+
+76] select Salaries.company_id, Salaries.employee_id, Salaries.employee_name, 
+    round(case when salary_max<1000 then Salaries.salary
+               when salary_max>=1000 and salary_max<=10000 then Salaries.salary * 0.76
+               else Salaries.salary * 0.51 end, 0) as salary
+from Salaries inner join (
+    select company_id, max(salary) as salary_max
+    from Salaries
+    group by company_id) as t
+on Salaries.company_id = t.company_id
+
+77] select e.left_operand, e.operator, e.right_operand,
+    case
+        when e.operator = '<' then if(l.value < r.value,'true','false')
+        when e.operator = '>' then if(l.value > r.value,'true','false')
+        else if(l.value = r.value,'true','false')
+    end as value
+from expressions e 
+left join variables l on e.left_operand = l.name 
+left join variables r on e.right_operand = r.name
+
+78] select c.name as country 
+from Person p 
+inner join Country c 
+on left (p.phone_number,3) = c.country_code 
+inner join (select caller_id as id, duration 
+            from Calls 
+            
+            union all 
+            
+            select callee_id as id, duration 
+            from Calls) phn 
+on p.id = phn.id 
+group by country 
+having avg(duration) > (select avg(duration) from Calls)
+
+79] SELECT name FROM Employee ORDER BY name;
+
+80] 
+
+81] 
+
+82] 
