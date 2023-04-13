@@ -76,12 +76,11 @@ We know nothing about average weather_state in Spain in November so we don't inc
 
 
 
-
 ANSWER :------
 
 show DATABASES;
-create database sql_assg;
-use sql_assg;
+create database sql_a;
+use sql_a;
 
 show tables;
 
@@ -90,11 +89,6 @@ create table weather(
     weather_state int,
     day_column date
 );
-create table countries(
-    country_id int,
-    country_name varchar(100)
-);
-
 
 insert into weather values(2,15,'2019-11-01');
 insert into weather values(2,12,'2019-10-27');
@@ -111,6 +105,11 @@ insert into weather values(8,25,'2019-11-05');
 insert into weather values(8,27,'2019-11-15');
 insert into weather values(8,31,'2019-11-25');
 
+create table countries(
+    country_id int,
+    country_name varchar(100)
+);
+
 insert into countries values(2,'USA');
 insert into countries values(3,'Australia');
 insert into countries values(7,'Peru');
@@ -118,11 +117,14 @@ insert into countries values(5,'China');
 insert into countries values(8,'Morocco');
 insert into countries values(9,'Spain');
 
+
 select co.country_name, 
   case 
-    when avg(w.weather_state) <=15 THEN "cold"
-    when avg(w.weather_state) >=25 THEN  "hot"
+    when avg(w.weather_state) <=15 THEN "Cold"
+    when avg(w.weather_state) >=25 THEN "Hot"
     else "Warm"  
-  end as result
-from countries co join weather w where co.country_id = w.country_id 
-and day_column between "2019-11-01" and "2019-11-31" group by co.country_name;
+  end as weather_type
+from countries co inner join weather w 
+on co.country_id = w.country_id 
+where day_column between "2019-11-01" and "2019-11-30" 
+group by co.country_name;
