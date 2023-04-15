@@ -51,6 +51,10 @@ Frozen 2 and Joker have a rating average of 3.5 in February but Frozen 2 is smal
 
 ANSWER :--
 
+
+## solution_1
+# Construct the aggregate number with the name in the inside query, then sort and pick the top in the outside query
+
 SELECT name FROM 
 (
    SELECT u.name name, count(*) total 
@@ -75,8 +79,25 @@ ORDER BY average desc, title
 LIMIT  1;
 
 
-## Construct the aggregate number with the name in the inside query, then sort and pick the top in the outside query
+## solution_2
 
+(select name results
+from Users
+left join Movie_Rating
+using (user_id)
+group by user_id
+order by count(rating) desc, name
+limit 1)
 
+union
+
+(select title
+from Movies
+left join Movie_Rating
+using(movie_id)
+where left(created_at,7) = '2020-02'
+group by movie_id
+order by avg(rating) desc, title
+limit 1)
 
 
