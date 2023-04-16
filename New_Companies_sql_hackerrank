@@ -1,0 +1,51 @@
+  Question :-
+  https://www.hackerrank.com/challenges/the-company/problem
+
+## solution_1 :
+
+SELECT COMPANY_CODE, FOUNDER,
+(SELECT COUNT(DISTINCT LEAD_MANAGER_CODE) FROM LEAD_MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
+(SELECT COUNT(DISTINCT SENIOR_MANAGER_CODE) FROM SENIOR_MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
+(SELECT COUNT(DISTINCT MANAGER_CODE) FROM MANAGER WHERE COMPANY_CODE = C.COMPANY_CODE),
+(SELECT COUNT(DISTINCT EMPLOYEE_CODE) FROM EMPLOYEE WHERE COMPANY_CODE = C.COMPANY_CODE)
+FROM COMPANY C
+ORDER BY COMPANY_CODE;
+
+
+-----------------------------------------------------------------------------------------------------------
+## solution_2 :
+
+select
+    C.company_code, 
+    group_concat( distinct C.founder),
+    count(distinct LM.lead_manager_code),
+    count(distinct SM.senior_manager_code),
+    count(distinct M.manager_code),
+    count(distinct E.employee_code)
+from Company C
+left join Lead_Manager LM on LM.company_code = C.company_code
+left join Senior_Manager SM on SM.lead_manager_code = LM.lead_manager_code
+left join Manager M on M.senior_manager_code = SM.senior_manager_code
+left join Employee E on E.manager_code = M.manager_code
+group by C.company_code
+order by C.company_code
+
+--------------------------------------------------------------------------------------
+## solution_3
+
+select c.company_code, c.founder,
+       count(distinct l.lead_manager_code),
+       count(distinct s.senior_manager_code),
+       count(distinct m.manager_code),
+       count(distinct e.employee_code)
+from Company as c 
+join Lead_Manager as l 
+on c.company_code = l.company_code
+join Senior_Manager as s
+on l.lead_manager_code = s.lead_manager_code
+join Manager as m 
+on m.senior_manager_code = s.senior_manager_code
+join Employee as e
+on e.manager_code = m.manager_code
+group by c.company_code, c.founder
+order by c.company_code;
