@@ -1,5 +1,5 @@
-
-Write an SQL query to report the name and bonus amount of each employee with a bonus less than 1000.
+####  
+Q] Write an SQL query to report the name and bonus amount of each employee with a bonus less than 1000.
 Return the result table in any order.
 The query result format is in the following example.
 
@@ -43,6 +43,77 @@ WHERE IFNULL(b.bonus,0) <1000
 
 
 -------------------------------------------------------------------------------------------------------------------------------
+
+### 
+Q] Write an SQL query to report for every three line segments whether they can form a triangle.
+Return the result table in any order.
+The query result format is in the following example.
+
+Input: 
+Triangle table:
++----+----+----+
+| x  | y  | z  |
++----+----+----+
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
++----+----+----+
+Output: 
++----+----+----+----------+
+| x  | y  | z  | triangle |
++----+----+----+----------+
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
++----+----+----+----------+
+
+
+1]
+select x,y,z,
+IF(x+y>z and y+z>x and x+z>y, 'Yes','No') as triangle
+from Triangle;
+
+2]
+SELECT x,y,z,
+CASE
+    WHEN x < y+z and y<x+z and z<x+y THEN "Yes"
+    ELSE "No"
+END AS triangle
+FROM Triangle;
+
+3]
+select x, y, z,
+case when ((x <= y and z <= y and x + z > y) OR
+            (y <= x and z <= x and y + z > x) OR
+            (x <= z and y <= z and x + y > z)) then 'Yes'
+    else 'No'
+    end as triangle
+from triangle
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+### 
+Q]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
