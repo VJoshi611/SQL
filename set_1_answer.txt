@@ -48,14 +48,29 @@ select city, len
 
 16] SELECT distinct CITY FROM STATION WHERE CITY NOT LIKE '[aeiouAEIOU]%' AND CITY NOT LIKE '%[aeiouAEIOU]' 
 
-17] select p.product_id, p.product_name from product p where p.product_id not in  
+17]
+select p.product_id, p.product_name from product p where p.product_id not in  
 ( select product.id from sales where sale_date not between '2019-01-01' AND '2019-03-31' )
+
+method_2] 
+select Product.product_id, product_name
+from Product left join Sales
+on Product.product_id = Sales.product_id
+group by product_id, product_name
+having min(sale_date) >= '2019-01-01' and max(sale_date) <= '2019-03-31';
 
 18] select author_id from Views where author_id = viewer_id group by author_id  order by author_id
 
 19] select count(*)*100.0/b.total as immdediate_percentage from Delivery a, 
 (select count(*) as total from Delivery) b
 where a.order_date = a.customer_pref_delivery_date;
+
+method_2]
+select round(100*d2.immediate_orders/count(d1.delivery_id), 2) as immediate_percentage
+from Delivery d1,
+    (select count(order_date) as immediate_orders
+    from Delivery 
+    where (order_date = customer_pref_delivery_date)) d2
 
 20] select ad_id,
 ifnull(
@@ -73,6 +88,30 @@ as ctr
 from Ads
 group by ad_id
 order by ctr desc, ad_id asc;
+
+method_2]
+select
+ad_id, round(avg(case when action=’Clicked’ then 1 else 0 end)*100,2) ctr
+from Ads
+group by ad_id
+order by ad_id,ctr desc
+
+method_3]
+SELECT
+    ad_id,
+    ROUND(IFNULL(SUM(CASE WHEN action='Clicked' THEN 1 ELSE 0 END) * 100 / 
+    (SUM(CASE WHEN action='Clicked' THEN 1 ELSE 0 END) + SUM(CASE WHEN action='Viewed' THEN 1 ELSE 0 END)), 0), 2)
+    as ctr
+FROM Ads
+GROUP BY 1
+ORDER BY 2 DESC, 1
+
+method_4]
+SELECT ad_id,
+  ROUND(100 * COALESCE(SUM(action = 'Clicked') / SUM(action IN ('Clicked', 'Viewed')), 0), 2) ctr
+FROM Ads
+GROUP BY ad_id
+ORDER BY ctr DESC, ad_id;
 
 21] SELECT employee_id, COUNT(team_id) OVER (PARTITION BY team_id) team_size
 FROM Employee
