@@ -16,8 +16,25 @@
 
 9] SELECT COUNT(CITY)-COUNT(DISTINCT(CITY)) FROM STATION
 
-10] SELECT MIN(CITY) as shortest_city, MIN(LEN(CITY)) length  from station order by city  
-SELECT MAX(CITY) as longest_city, MAX(LEN(CITY)) FROM STATION 
+10] 
+select top 1 city, len(city) from station order by len(city) ASC, city ASC; 
+select top 1 city, len(city) from station order by len(city) DESC, city ASC;
+
+10]
+with cte as (
+  select city,
+         length(city) as len,
+         row_number() over (order by length(city), city) as smallest_rn,
+         row_number() over (order by length(city) desc, city) as largest_rn
+    from station
+)
+select city, len
+  from cte
+ where smallest_rn = 1
+union all
+select city, len
+  from cte
+ where largest_rn = 1
 
 11] SELECT distinct city FROM STATION where city like '[aeiouAEIOU]%'
 
